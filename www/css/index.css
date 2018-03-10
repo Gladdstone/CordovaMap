@@ -1,0 +1,38 @@
+html, body { 
+    height: 100%; 
+    margin: 0; 
+    padding: 0;
+}
+
+.overmap {
+    position: absolute;
+    z-index: 1;
+}
+
+#city-search {
+    width: 100%;
+}
+
+#map-canvas { 
+    height: 100%;
+}
+
+#searchbar {
+    width: 100%;
+    margin-top: 15%;
+    display: grid;
+    grid-template-columns: 10% 80% 10%;
+}
+
+#temp {
+    border-radius: 50%;
+    background-color: #ffffff;
+    font-size: 2rem;
+    margin-right: 10%;
+    margin-left: auto;
+}
+
+#tempbutton {
+    bottom: 10%;
+    width: 100%;
+}
