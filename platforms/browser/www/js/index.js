@@ -46,7 +46,46 @@ var app = {
             .catch( err => {
                 alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
             })
+        
+        // TODO - this doesn't seem to work for some reason...
+        $("input[type=button]").bind('touchstart',function(e){
+            // $(this).css('box-shadow:','0px 0px');
+            $(this).addClass("buttonpress");
+        });
+        
+        $("input[type='button']").bind('touchend',function(e){
+            // $(this).css('box-shadow','0px 4px 10px #888888');
+            $(this).removeClass("buttonpress");
+        });
     }
 };
 
 app.initialize();
+
+function setConversion(obj) {
+    if($(obj).hasClass("buttonpress")) {
+        $(obj).removeClass("buttonpress");
+
+        // add "in" animation classes
+        $("#celsius").addClass("celsius-in");
+        $("#fahrenheit").addClass("fahrenheit-in");
+
+        // remove "out" animation classes
+        if($("#celsius").hasClass("celsius-out")) {
+            $("#celsius").removeClass("celsius-out");
+            $("#fahrenheit").removeClass("fahrenheit-out");
+        }
+    } else {
+        $(obj).addClass("buttonpress");
+
+        // add "out" animation classes
+        $("#celsius").addClass("celsius-out");
+        $("#fahrenheit").addClass("fahrenheit-out");
+
+        // remove "in" animation classes
+        if($("#celsius").hasClass("celsius-in")) {
+            $("#celsius").removeClass("celsius-in");
+            $("#fahrenheit").removeClass("fahrenheit-in");
+        }
+    }
+}
