@@ -19,7 +19,9 @@
             <span>&nbsp;</span>
         </div>
         <div id="tempbutton" class="overmap">
-            <button id="temp" type="button">78&deg;</button>
+            <button id="temp" type="button" onclick="setConversion(this);">78&deg;</button>
+            <button id="fahrenheit" type="button" class="temp-small">&deg;F</button>
+            <button id="celsius" type="button" class="temp-small">&deg;C</button>
         </div>
         <div id="map-canvas"><h3>Loading map. Please wait...</h3></div>
     </body>

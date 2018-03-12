@@ -8,9 +8,51 @@ html, body {
     box-shadow: 0px 0px !important;
 }
 
+.celsius-in {
+    animation-name: celsius-in;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}
+.celsius-out {
+    animation-name: celsius-out;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}
+.fahrenheit-in {
+    animation-name: fahrenheit-in;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}
+.fahrenheit-out {
+    animation-name: fahrenheit-out;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}
+
 .overmap {
     position: absolute;
     z-index: 1;
+}
+
+.temp-small {
+    position: absolute;
+    border-radius: 50%;
+    border-color: #007aff;
+    background-color: #007aff;
+    box-shadow: 0px 4px 10px #888888;
+    color: #ffffff;
+    font-size: 1.2rem;
+    text-align: center;
+    vertical-align: middle;
+    height: 10vw;
+    width: 10vw;
+    transition: box-shadow 0.3s ease-in-out;
+    right: 60px;
+    top: 25%;
+}
+
+#celsius {
+    z-index: 0.8;
 }
 
 #city-search {
@@ -19,8 +61,13 @@ html, body {
     width: 100%;
 }
 
+#fahrenheit {
+    z-index: 0.9;
+}
+
 #map-canvas { 
     height: 100%;
+    z-index: 0.5;
 }
 
 #searchbar {
@@ -31,6 +78,7 @@ html, body {
 }
 
 #temp {
+    position: relative;
     border-radius: 50%;
     border-color: #007aff;
     background-color: #007aff;
@@ -44,9 +92,31 @@ html, body {
     height: 20vw;
     width: 20vw;
     transition: box-shadow 0.3s ease-in-out;
+    z-index: 5;
 }
 
 #tempbutton {
     bottom: 10%;
     width: 100%;
+    position: absolute;
+}
+
+@keyframes celsius-out {
+    from { right: 40px; }
+    to { right: 50%; }
+}
+
+@keyframes celsius-in {
+    from { right: 50%; }
+    to { right: 40px; }
+}
+
+@keyframes fahrenheit-out {
+    from { right: 40px; }
+    to { right: 70%; }
+}
+
+@keyframes fahrenheit-in {
+    from { right: 70%; }
+    to {right: 40px;}
 }

@@ -61,3 +61,31 @@ var app = {
 };
 
 app.initialize();
+
+function setConversion(obj) {
+    if($(obj).hasClass("buttonpress")) {
+        $(obj).removeClass("buttonpress");
+
+        // add "in" animation classes
+        $("#celsius").addClass("celsius-in");
+        $("#fahrenheit").addClass("fahrenheit-in");
+
+        // remove "out" animation classes
+        if($("#celsius").hasClass("celsius-out")) {
+            $("#celsius").removeClass("celsius-out");
+            $("#fahrenheit").removeClass("fahrenheit-out");
+        }
+    } else {
+        $(obj).addClass("buttonpress");
+
+        // add "out" animation classes
+        $("#celsius").addClass("celsius-out");
+        $("#fahrenheit").addClass("fahrenheit-out");
+
+        // remove "in" animation classes
+        if($("#celsius").hasClass("celsius-in")) {
+            $("#celsius").removeClass("celsius-in");
+            $("#fahrenheit").removeClass("fahrenheit-in");
+        }
+    }
+}

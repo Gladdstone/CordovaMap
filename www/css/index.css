@@ -13,19 +13,16 @@ html, body {
     animation-duration: 0.5s;
     animation-fill-mode: forwards;
 }
-
 .celsius-out {
     animation-name: celsius-out;
     animation-duration: 0.5s;
     animation-fill-mode: forwards;
 }
-
 .fahrenheit-in {
     animation-name: fahrenheit-in;
     animation-duration: 0.5s;
     animation-fill-mode: forwards;
 }
-
 .fahrenheit-out {
     animation-name: fahrenheit-out;
     animation-duration: 0.5s;
@@ -47,10 +44,11 @@ html, body {
     font-size: 1.2rem;
     text-align: center;
     vertical-align: middle;
-    margin-left: 75%;
     height: 10vw;
     width: 10vw;
     transition: box-shadow 0.3s ease-in-out;
+    right: 60px;
+    top: 25%;
 }
 
 #celsius {
@@ -80,6 +78,7 @@ html, body {
 }
 
 #temp {
+    position: relative;
     border-radius: 50%;
     border-color: #007aff;
     background-color: #007aff;
@@ -93,29 +92,31 @@ html, body {
     height: 20vw;
     width: 20vw;
     transition: box-shadow 0.3s ease-in-out;
+    z-index: 5;
 }
 
 #tempbutton {
     bottom: 10%;
     width: 100%;
+    position: absolute;
 }
 
 @keyframes celsius-out {
-    from { margin-left: 75%; }
-    to { margin-left: 30%; }
+    from { right: 40px; }
+    to { right: 50%; }
 }
 
 @keyframes celsius-in {
-    from { margin-left: 30%; }
-    to { margin-left: 75%; }
+    from { right: 50%; }
+    to { right: 40px; }
 }
 
 @keyframes fahrenheit-out {
-    from { margin-left: 75%; }
-    to { margin-left: 50%; }
+    from { right: 40px; }
+    to { right: 70%; }
 }
 
 @keyframes fahrenheit-in {
-    from { margin-left: 50%; }
-    to { margin-left: 75%; }
+    from { right: 70%; }
+    to {right: 40px;}
 }
