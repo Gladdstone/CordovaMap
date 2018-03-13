@@ -5,7 +5,7 @@
   "short_name": "HybridMap",
   "version": "com.farrell.hybridmap",
   "description": "A sample Apache Cordova application that responds to the deviceready event.",
-  "author": "Apache Cordova Team",
+  "author": "Joseph Farrell",
   "icons": [],
   "start_url": "index.html"
 }

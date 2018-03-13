@@ -2,6 +2,13 @@
 // GLOBAL
 //-----------------------------------------------
 
+// OpenWeatherMap API config file
+let weatherConfig = "weatherConfig.json";
+
+let lat,
+    lon;
+
+// Temperature object contains value, and current mode of measurement
 let temperature = {
     type: "f",
     value: 78
@@ -17,8 +24,11 @@ var app = {
     onDeviceReady: function() {
         // Set current position as default
         getCurrentPosition();
+
+        // Open Weather API
+        getWeather(lat, lon);
         
-        // Set current temperature
+        // TODO - Set current temperature
         temperature.value = 78;
         $("#temp").html(temperature.value + "&deg;");
         
@@ -49,20 +59,47 @@ function getCurrentPosition() {
     curPosition()
         .then( position => {
             if ( position.coords ) {
-                let lat = position.coords.latitude,
-                    lng=position.coords.longitude,
+                lat = position.coords.latitude;
+                lon=position.coords.longitude;
             
-                //Google Maps
-                myLatlng = new google.maps.LatLng( lat, lng ),
-                mapOptions = { zoom: 3, center: myLatlng },
+                // Google Maps
+                let myLatlon = new google.maps.LatLng( lat, lon ),
+                mapOptions = { zoom: 3, center: myLatlon },
                 map = new google.maps.Map( document.getElementById( 'map-canvas' ), mapOptions ),
-                marker = new google.maps.Marker( { position: myLatlng, map: map } );
+                marker = new google.maps.Marker( { position: myLatlon, map: map } );
             }
         })
         .catch( err => {
             alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
         })
 }
+
+
+function getWeather(lat, lon) {
+    let xhr = new XMLHttpRequest(),
+        //url = weatherConfig.url + "lat=" + lat + "&lon=" + lon + weatherConfig.key;
+        url = "http://api.openweathermap.org/data/2.5/weather?q=Rochester&appid={}";
+    xhr.onreadystatechange = function() {
+        // return weatherConfig = this.readyState === 4 && this.status === 200 ? JSON.parse(this.responseText) : "XHR error: unable to retrieve weather data from API";
+        if(this.readyState === 4 && this.status === 200) {
+            console.log(JSON.parse(this.responseText));
+        } else {
+            console.log("error");
+        }
+    }
+    xhr.open("GET", url, true);
+    xhr.send();
+}
+
+
+// function getWeatherConfig() {
+//     let xhr = new XMLHttpRequest();
+//     xhr.onreadystatechange = function() {
+//         return config = (this.readyState == 4 && this.status == 200) ? JSON.parse(this.responseText) : "XHR error: unable to retrieve weather configuration file";
+//     }
+//     xhr.open("GET", weatherConfig, true);
+//     xhr.send();
+// }
 
 
 function setConversion(obj) {
