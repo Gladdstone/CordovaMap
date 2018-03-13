@@ -31,17 +31,6 @@ var app = {
         // TODO - Set current temperature
         temperature.value = 78;
         $("#temp").html(temperature.value + "&deg;");
-        
-        // TODO - this doesn't seem to work for some reason...
-        $("input[type=button]").bind('touchstart',function(e){
-            // $(this).css('box-shadow:','0px 0px');
-            $(this).addClass("buttonpress");
-        });
-        
-        $("input[type='button']").bind('touchend',function(e){
-            // $(this).css('box-shadow','0px 4px 10px #888888');
-            $(this).removeClass("buttonpress");
-        });
     }
 };
 
@@ -49,8 +38,11 @@ var app = {
 app.initialize();
 
 
+/**
+ * Call device's current position, use return latitude and longitude to retrieve city and state from Google Maps API
+ */
 function getCurrentPosition() {
-    var curPosition = () => {
+    let curPosition = () => {
         return new Promise( (resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 30000  });
         });
@@ -60,17 +52,34 @@ function getCurrentPosition() {
         .then( position => {
             if ( position.coords ) {
                 lat = position.coords.latitude;
-                lon=position.coords.longitude;
-            
+                lon = position.coords.longitude;
+
+                let curCity = () => {
+                    return new Promise( (resolve, reject) => {
+                        let geocoding = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + '%2C' + lon + '&language=en'; 
+                        $.getJSON(geocoding)
+                            .done(resolve)
+                            .fail(reject);
+                    });
+                };
+
+                curCity()
+                    .then( location => {
+                        console.log(location);
+                    })
+                    .catch( err => {
+                        alert("Code: " + err.code + "\n" + "Message: " + err.message + "\n");
+                    });
+
                 // Google Maps
-                let myLatlon = new google.maps.LatLng( lat, lon ),
-                mapOptions = { zoom: 3, center: myLatlon },
+                let myLatlon = new google.maps.LatLng( lat, lon );
+                let mapOptions = { zoom: 3, center: myLatlon },
                 map = new google.maps.Map( document.getElementById( 'map-canvas' ), mapOptions ),
                 marker = new google.maps.Marker( { position: myLatlon, map: map } );
             }
         })
         .catch( err => {
-            alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
+            alert('code: ' + err.code + '\n' + 'message: ' + err.message + '\n');
         })
 }
 
@@ -90,16 +99,6 @@ function getWeather(lat, lon) {
     xhr.open("GET", url, true);
     xhr.send();
 }
-
-
-// function getWeatherConfig() {
-//     let xhr = new XMLHttpRequest();
-//     xhr.onreadystatechange = function() {
-//         return config = (this.readyState == 4 && this.status == 200) ? JSON.parse(this.responseText) : "XHR error: unable to retrieve weather configuration file";
-//     }
-//     xhr.open("GET", weatherConfig, true);
-//     xhr.send();
-// }
 
 
 function setConversion(obj) {
