@@ -5,9 +5,6 @@
 // OpenWeatherMap API config file
 let weatherConfig = "weatherConfig.json";
 
-let lat,
-    lon;
-
 // Temperature object contains value, and current mode of measurement
 let temperature = {
     type: "f",
@@ -24,13 +21,6 @@ var app = {
     onDeviceReady: function() {
         // Set current position as default
         getCurrentPosition();
-
-        // Open Weather API
-        getWeather(lat, lon);
-        
-        // TODO - Set current temperature
-        temperature.value = 78;
-        $("#temp").html(temperature.value + "&deg;");
     }
 };
 
@@ -54,53 +44,72 @@ function getCurrentPosition() {
                 lat = position.coords.latitude;
                 lon = position.coords.longitude;
 
-                let curCity = () => {
-                    return new Promise( (resolve, reject) => {
-                        let geocoding = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + '%2C' + lon + '&language=en'; 
-                        $.getJSON(geocoding)
-                            .done(resolve)
-                            .fail(reject);
-                    });
-                };
-
-                curCity()
-                    .then( location => {
-                        console.log(location);
-                    })
-                    .catch( err => {
-                        alert("Code: " + err.code + "\n" + "Message: " + err.message + "\n");
-                    });
-
                 // Google Maps
                 let myLatlon = new google.maps.LatLng( lat, lon );
                 let mapOptions = { zoom: 3, center: myLatlon },
                 map = new google.maps.Map( document.getElementById( 'map-canvas' ), mapOptions ),
                 marker = new google.maps.Marker( { position: myLatlon, map: map } );
+
+                // let curCity = () => {
+                //     return new Promise( (resolve, reject) => {
+                //         let geocoding = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + '%2C' + lon + '&language=en'; 
+                //         $.getJSON(geocoding)
+                //             .done(resolve)
+                //             .fail(reject);
+                //     });
+                // };
+
+                // curCity()
+                //     .then( location => {
+                //         let city = location.results[1].formatted_address.split(",")[0];
+                //         console.log(location.results);
+                        
+                //         // getWeather(city);
+                //     })
+                //     .catch( err => {
+                //         alert("Code: " + err.code + "\n" + "Message: " + err.message + "\n");
+                //     });
+
+                getWeather(lat, lon);
             }
         })
         .catch( err => {
             alert('code: ' + err.code + '\n' + 'message: ' + err.message + '\n');
-        })
+        });
 }
 
 
+/**
+ * Retrieve weather data from Open Weather API, and update view.
+ * @param {*} lat user latitudinal position
+ * @param {*} lon user longitudinal position
+ */
 function getWeather(lat, lon) {
-    let xhr = new XMLHttpRequest(),
-        //url = weatherConfig.url + "lat=" + lat + "&lon=" + lon + weatherConfig.key;
-        url = "http://api.openweathermap.org/data/2.5/weather?q=Rochester&appid={}";
-    xhr.onreadystatechange = function() {
-        // return weatherConfig = this.readyState === 4 && this.status === 200 ? JSON.parse(this.responseText) : "XHR error: unable to retrieve weather data from API";
-        if(this.readyState === 4 && this.status === 200) {
-            console.log(JSON.parse(this.responseText));
-        } else {
-            console.log("error");
-        }
-    }
-    xhr.open("GET", url, true);
-    xhr.send();
+    let callWeather = () => {
+        return new Promise( (resolve, reject) => {
+            let url = "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&appid={}";
+            $.getJSON(url)
+                .done(resolve)
+                .fail(reject);
+        });
+    };
+
+    callWeather()
+        .then( weather => {
+            temperature.value = temperature.type === "f" ? Math.round(1.8 * (weather.main.temp - 273) + 32) : Math.round(weather.main.temp - 273);
+            $("#temp").html(temperature.value + "&deg;");
+        })
+        .catch( err => {
+            alert("Code: " + err.code + "\nMessage: " + err.message + "\n");
+            weather = "Failed to call Open Weather";            
+        });
 }
 
 
+/**
+ * Handler for temperature button animation
+ * @param {*} obj temperature button object
+ */
 function setConversion(obj) {
     if($(obj).hasClass("buttonpress")) {
         $(obj).removeClass("buttonpress");
