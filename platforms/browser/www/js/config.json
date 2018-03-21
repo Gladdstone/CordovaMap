@@ -1,0 +1,9 @@
+{
+    "google": {
+        "key": "AIzaSyDQ6Br3YsfGSsJd99z4kiC1mQTzbDgkNLs"
+    },
+    "weather": {
+        "url": "http://api.openweathermap.org/data/2.5/weather?",
+        "key": "&appid=19ff52dc89b490427714e53d22080e3b"
+    }
+}

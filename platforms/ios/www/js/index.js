@@ -2,8 +2,7 @@
 // GLOBAL
 //-----------------------------------------------
 
-// OpenWeatherMap API config file
-let weatherConfig = "weatherConfig.json";
+let google, weather;
 
 // Temperature object contains value, and current mode of measurement
 let temperature = {
@@ -14,6 +13,10 @@ let temperature = {
 var app = {
     // Application Constructor
     initialize: function() {
+        let config = xhrGet("config.json");
+        console.log(config);
+        google = config.google;
+        weather = config.weather;
         document.addEventListener('deviceready', this.onDeviceReady.bind(this), false);
     },
 
@@ -87,7 +90,7 @@ function getCurrentPosition() {
 function getWeather(lat, lon) {
     let callWeather = () => {
         return new Promise( (resolve, reject) => {
-            let url = "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&appid=19ff52dc89b490427714e53d22080e3b";
+            let url = "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&appid=" + weather.key;
             $.getJSON(url)
                 .done(resolve)
                 .fail(reject);
@@ -160,4 +163,18 @@ function setFahrenheit() {
         temperature.type = "f";
     }
     $("#temp").html(temperature.value + "&deg;");
+}
+
+
+function xhrGet(path) {
+    let xhr = new XMLHttpRequest();
+    let config = "";
+    xhr.onreadystatechange = function() {
+        config = (this.readyState == 4 && this.status == 200) ? this.responsetext : "xhrGet error";
+    };
+
+    xhr.open("GET", path, true);
+    xhr.send();
+
+    return config;
 }
