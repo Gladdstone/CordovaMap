@@ -2,8 +2,6 @@
 // GLOBAL
 //-----------------------------------------------
 
-let google, weather;
-
 // Temperature object contains value, and current mode of measurement
 let temperature = {
     type: "f",
@@ -13,10 +11,6 @@ let temperature = {
 var app = {
     // Application Constructor
     initialize: function() {
-        let config = xhrGet("config.json");
-        console.log(config);
-        google = config.google;
-        weather = config.weather;
         document.addEventListener('deviceready', this.onDeviceReady.bind(this), false);
     },
 
@@ -31,27 +25,31 @@ var app = {
 app.initialize();
 
 
+//-----------------------------------------------
+// FUNCTIONS
+//-----------------------------------------------
+
 /**
  * Call device's current position, use return latitude and longitude to retrieve city and state from Google Maps API
  */
 function getCurrentPosition() {
     let curPosition = () => {
         return new Promise( (resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 30000  });
+            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 20000  });
         });
     };
 
     curPosition()
         .then( position => {
-            if ( position.coords ) {
+            if(position.coords) {
                 lat = position.coords.latitude;
                 lon = position.coords.longitude;
 
                 // Google Maps
-                let myLatlon = new google.maps.LatLng( lat, lon );
-                let mapOptions = { zoom: 3, center: myLatlon },
-                map = new google.maps.Map( document.getElementById( 'map-canvas' ), mapOptions ),
-                marker = new google.maps.Marker( { position: myLatlon, map: map } );
+                let myLatlon = new google.maps.LatLng(lat, lon);
+                let mapOptions = {zoom: 3, center: myLatlon},
+                map = new google.maps.Map($("map-canvas"), mapOptions),
+                marker = new google.maps.Marker({ position: myLatlon, map: map });
 
                 // let curCity = () => {
                 //     return new Promise( (resolve, reject) => {
@@ -77,7 +75,7 @@ function getCurrentPosition() {
             }
         })
         .catch( err => {
-            alert('code: ' + err.code + '\n' + 'message: ' + err.message + '\n');
+            errAlert(err, "curPosition");
         });
 }
 
@@ -88,24 +86,8 @@ function getCurrentPosition() {
  * @param {*} lon user longitudinal position
  */
 function getWeather(lat, lon) {
-    let callWeather = () => {
-        return new Promise( (resolve, reject) => {
-            let url = "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&appid=" + weather.key;
-            $.getJSON(url)
-                .done(resolve)
-                .fail(reject);
-        });
-    };
-
-    callWeather()
-        .then( weather => {
-            temperature.value = temperature.type === "f" ? Math.round(1.8 * (weather.main.temp - 273) + 32) : Math.round(weather.main.temp - 273);
-            $("#temp").html(temperature.value + "&deg;");
-        })
-        .catch( err => {
-            alert("Code: " + err.code + "\nMessage: " + err.message + "\n");
-            weather = "Failed to call Open Weather";            
-        });
+    let url = "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&appid={}";
+    getXHR("GET", url, setWeather);
 }
 
 
@@ -150,7 +132,7 @@ function setCelsius() {
         temperature.value = Math.round((temperature.value - 32) / 1.8);
         temperature.type = "c";
     }
-    $("#temp").html(temperature.value + "&deg;");
+    $("temp").innerHTML(temperature.value + "&deg;");
 }
 
 
@@ -162,19 +144,40 @@ function setFahrenheit() {
         temperature.value = Math.round(temperature.value * 1.8 + 32);
         temperature.type = "f";
     }
-    $("#temp").html(temperature.value + "&deg;");
+    $("temp").innerHTML(temperature.value + "&deg;");
 }
 
 
-function xhrGet(path) {
+/**
+ * Take data from API call, and set appropriate values
+ * @param {String} response unparsed JSON text
+ */
+function setWeather(response) {
+    let weather = JSON.parse(response);
+    temperature.value = temperature.type === "f" ? Math.round(1.8 * (weather.main.temp - 273) + 32) : Math.round(weather.main.temp - 273);
+    $("temp").innerHTML = temperature.value + "&deg;";
+}
+
+
+//-----------------------------------------------
+// UTILITY FUNCTIONS
+//-----------------------------------------------
+
+function errAlert(err, loc) {
+    let errMessage = "Error: " + loc + "\n" + 
+        "Code: " + err.code + "\n" +
+        "Message: " + err.message;
+    alert(errMessage);
+}
+
+function getXHR(method, url, callback) {
     let xhr = new XMLHttpRequest();
-    let config = "";
     xhr.onreadystatechange = function() {
-        config = (this.readyState == 4 && this.status == 200) ? this.responsetext : "xhrGet error";
-    };
+        if(this.readyState === 4 && this.status === 200) {
+            callback(xhr.responseText);
+        }
+    }
 
-    xhr.open("GET", path, true);
+    xhr.open(method, url, true);
     xhr.send();
-
-    return config;
 }
