@@ -43,35 +43,15 @@ function getCurrentPosition() {
         .then( position => {
             if(position.coords) {
                 lat = position.coords.latitude;
-                lon = position.coords.longitude;
+                lng = position.coords.longitude;
 
                 // Google Maps
-                let myLatlon = new google.maps.LatLng(lat, lon);
-                let mapOptions = {zoom: 3, center: myLatlon},
+                let myLatlng = new google.maps.LatLng(lat, lng);
+                let mapOptions = {zoom: 3, center: myLatlng},
                 map = new google.maps.Map($("map-canvas"), mapOptions),
-                marker = new google.maps.Marker({ position: myLatlon, map: map });
+                marker = new google.maps.Marker({ position: myLatlng, map: map });
 
-                // let curCity = () => {
-                //     return new Promise( (resolve, reject) => {
-                //         let geocoding = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + '%2C' + lon + '&language=en'; 
-                //         $.getJSON(geocoding)
-                //             .done(resolve)
-                //             .fail(reject);
-                //     });
-                // };
-
-                // curCity()
-                //     .then( location => {
-                //         let city = location.results[1].formatted_address.split(",")[0];
-                //         console.log(location.results);
-                        
-                //         // getWeather(city);
-                //     })
-                //     .catch( err => {
-                //         alert("Code: " + err.code + "\n" + "Message: " + err.message + "\n");
-                //     });
-
-                getWeather(lat, lon);
+                getWeather(lat, lng);
             }
         })
         .catch( err => {
@@ -85,9 +65,19 @@ function getCurrentPosition() {
  * @param {*} lat user latitudinal position
  * @param {*} lon user longitudinal position
  */
-function getWeather(lat, lon) {
-    let url = "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&appid={}";
+function getWeather(lat, lng) {
+    let url = "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lng + "&appid=19ff52dc89b490427714e53d22080e3b";  
     getXHR("GET", url, setWeather);
+}
+
+
+/**
+ * Places request to getXHR for Google Maps with setCity callback.
+ * @param {*} city user-input city value
+ */
+function searchCity(city) {
+    let url = "https://maps.googleapis.com/maps/api/geocode/json?address="+encodeURIComponent(city);
+    getXHR("GET", url, setCity);
 }
 
 
@@ -95,33 +85,33 @@ function getWeather(lat, lon) {
  * Handler for temperature button animation
  * @param {*} obj temperature button object
  */
-function setConversion(obj) {
-    if($(obj).hasClass("buttonpress")) {
-        $(obj).removeClass("buttonpress");
+// function setConversion(obj) {
+//     if($(obj).hasClass("buttonpress")) {
+//         $(obj).removeClass("buttonpress");
 
-        // add "in" animation classes
-        $("#celsius").addClass("celsius-in");
-        $("#fahrenheit").addClass("fahrenheit-in");
+//         // add "in" animation classes
+//         $("#celsius").addClass("celsius-in");
+//         $("#fahrenheit").addClass("fahrenheit-in");
 
-        // remove "out" animation classes
-        if($("#celsius").hasClass("celsius-out")) {
-            $("#celsius").removeClass("celsius-out");
-            $("#fahrenheit").removeClass("fahrenheit-out");
-        }
-    } else {
-        $(obj).addClass("buttonpress");
+//         // remove "out" animation classes
+//         if($("#celsius").hasClass("celsius-out")) {
+//             $("#celsius").removeClass("celsius-out");
+//             $("#fahrenheit").removeClass("fahrenheit-out");
+//         }
+//     } else {
+//         $(obj).addClass("buttonpress");
 
-        // add "out" animation classes
-        $("#celsius").addClass("celsius-out");
-        $("#fahrenheit").addClass("fahrenheit-out");
+//         // add "out" animation classes
+//         $("#celsius").addClass("celsius-out");
+//         $("#fahrenheit").addClass("fahrenheit-out");
 
-        // remove "in" animation classes
-        if($("#celsius").hasClass("celsius-in")) {
-            $("#celsius").removeClass("celsius-in");
-            $("#fahrenheit").removeClass("fahrenheit-in");
-        }
-    }
-}
+//         // remove "in" animation classes
+//         if($("#celsius").hasClass("celsius-in")) {
+//             $("#celsius").removeClass("celsius-in");
+//             $("#fahrenheit").removeClass("fahrenheit-in");
+//         }
+//     }
+// }
 
 
 /**
@@ -133,6 +123,29 @@ function setCelsius() {
         temperature.type = "c";
     }
     $("temp").innerHTML(temperature.value + "&deg;");
+}
+
+
+/**
+ * Parses API response to retrieve latitude and longitude of user input city. Updates view and calls getWeather
+ * @param {*} response text response from Google Maps API
+ */
+function setCity(response) {
+    results = JSON.parse(response);
+
+    let lat = results.results[0].geometry.location.lat;
+    let lng = results.results[0].geometry.location.lng;
+
+    let myLatlng = new google.maps.LatLng(lat, lng),
+        mapOptions = {zoom: 8, center: myLatlng},
+        map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions),
+        marker = new google.maps.Marker({
+            position: myLatlng, 
+            map: map,
+            animation: google.maps.Animation.DROP
+        });
+
+    getWeather(lat, lng);
 }
 
 
@@ -180,4 +193,8 @@ function getXHR(method, url, callback) {
 
     xhr.open(method, url, true);
     xhr.send();
+}
+
+function $(id) {
+    return document.getElementById(id);
 }
