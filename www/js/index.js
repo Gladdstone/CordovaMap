@@ -24,6 +24,12 @@ var app = {
 // Initialize application
 app.initialize();
 
+document.onkeyup = function(e) {
+    if (e.keyCode == 13) {
+        searchCity($("city-search").value);
+    }
+};
+
 
 //-----------------------------------------------
 // FUNCTIONS
@@ -41,13 +47,14 @@ function getCurrentPosition() {
 
     curPosition()
         .then( position => {
+            console.log("Position retrieved from API");
             if(position.coords) {
                 lat = position.coords.latitude;
                 lng = position.coords.longitude;
 
                 // Google Maps
                 let myLatlng = new google.maps.LatLng(lat, lng);
-                let mapOptions = {zoom: 3, center: myLatlng},
+                let mapOptions = {zoom: 8, center: myLatlng},
                 map = new google.maps.Map($("map-canvas"), mapOptions),
                 marker = new google.maps.Marker({ position: myLatlng, map: map });
 
@@ -66,7 +73,7 @@ function getCurrentPosition() {
  * @param {*} lon user longitudinal position
  */
 function getWeather(lat, lng) {
-    let url = "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lng + "&appid=19ff52dc89b490427714e53d22080e3b";  
+    let url = "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lng + "&appid={}";  
     getXHR("GET", url, setWeather);
 }
 
@@ -122,7 +129,7 @@ function setCelsius() {
         temperature.value = Math.round((temperature.value - 32) / 1.8);
         temperature.type = "c";
     }
-    $("temp").innerHTML(temperature.value + "&deg;");
+    $("temp").innerHTML = temperature.value + "&deg;";
 }
 
 
@@ -138,7 +145,7 @@ function setCity(response) {
 
     let myLatlng = new google.maps.LatLng(lat, lng),
         mapOptions = {zoom: 8, center: myLatlng},
-        map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions),
+        map = new google.maps.Map($("map-canvas"), mapOptions),
         marker = new google.maps.Marker({
             position: myLatlng, 
             map: map,
@@ -157,7 +164,7 @@ function setFahrenheit() {
         temperature.value = Math.round(temperature.value * 1.8 + 32);
         temperature.type = "f";
     }
-    $("temp").innerHTML(temperature.value + "&deg;");
+    $("temp").innerHTML = temperature.value + "&deg;";
 }
 
 
@@ -166,7 +173,26 @@ function setFahrenheit() {
  * @param {String} response unparsed JSON text
  */
 function setWeather(response) {
+    console.log("Weather retrieved from API");
     let weather = JSON.parse(response);
+
+    let imageCode = weather.weather[0].icon;
+    let imageURL = "http://openweathermap.org/img/w/" + imageCode + ".png";
+    $("weathertitle").innerHTML = "<h2>Weather <img src='" + imageURL + "'/></h2>";
+
+    let description = weather.weather[0].description;
+    let humidity = weather.main.humidity;
+    let pressure = weather.main.pressure;
+    let sunrise = convertUnixTime(weather.sys.sunrise);
+    let sunset = convertUnixTime(weather.sys.sunset);
+
+    $("weatherlist").innerHTML = "<li>" + description.capitalize() + "</li>" +
+        "<li>&nbsp;</li>" +
+        "<li>Sunrise: " + sunrise + "</li>" +
+        "<li>Sunset: " + sunset + "</li>" +
+        "<li>Humidity: " + humidity + "%</li>" +
+        "<li>Pressure: " + pressure + "</li>";
+
     temperature.value = temperature.type === "f" ? Math.round(1.8 * (weather.main.temp - 273) + 32) : Math.round(weather.main.temp - 273);
     $("temp").innerHTML = temperature.value + "&deg;";
 }
@@ -175,6 +201,13 @@ function setWeather(response) {
 //-----------------------------------------------
 // UTILITY FUNCTIONS
 //-----------------------------------------------
+function convertUnixTime(time) {
+    let date = new Date(time * 1000);
+    let hour = date.getHours();
+    let minutes = "0" + date.getMinutes();
+    
+    return hour + ":" + minutes.substr(-2); 
+}
 
 function errAlert(err, loc) {
     let errMessage = "Error: " + loc + "\n" + 
@@ -197,4 +230,8 @@ function getXHR(method, url, callback) {
 
 function $(id) {
     return document.getElementById(id);
+}
+
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
 }

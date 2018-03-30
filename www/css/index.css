@@ -1,7 +1,12 @@
 html, body { 
+    font-family: "San Francisco", Helvetica, sans-serif;
     height: 100%; 
     margin: 0; 
     padding: 0;
+}
+
+ul {
+    list-style-type: none;
 }
 
 .buttonpress {
@@ -99,6 +104,33 @@ html, body {
     bottom: 10%;
     width: 100%;
     position: absolute;
+}
+
+#weatherdisplay {
+    background-color: #007aff;
+    border-radius: 10%;
+    box-shadow: 0px 4px 10px #888888;
+    color: #ffffff;
+    font-size: 1.2rem;
+    opacity: 0.8;
+    padding: 5%;
+}
+
+#weathertab {
+    display: grid;
+    grid-template-columns: 5% 40% 55%;
+    margin-top: 25%;
+    width: 100%;
+    position: absolute;
+}
+
+#weathertitle > div > h2 {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+#weathertab > div > ul {
+    padding-left: 0;
 }
 
 @keyframes celsius-out {

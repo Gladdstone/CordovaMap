@@ -8,14 +8,22 @@
         <link rel="stylesheet" type="text/css" href="css/index.css">
 
         <script type="text/javascript" src="cordova.js"></script>
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQ6Br3YsfGSsJd99z4kiC1mQTzbDgkNLs" type="text/javascript"></script>
-        <!-- <script type="text/javascript" src="js/joequery.js"></script> -->
+        <script src="https://maps.googleapis.com/maps/api/js?key={}" type="text/javascript"></script>
+        <script type="text/javascript" src="js/joequery.js"></script>             
         <script type="text/javascript" src="js/index.js"></script>
     </head>
     <body>
         <div id="searchbar" class="overmap">
             <span>&nbsp;</span>
-            <input id="city-search" type="text" placeholder="Search" onchange="searchCity(this.value);"/>
+            <input id="city-search" type="search" placeholder="Search" returnKeyType="Go" (keyup.enter)="searchCity(this.value);"/>
+            <span>&nbsp;</span>
+        </div>
+        <div id="weathertab" class="overmap">
+            <span>&nbsp;</span>
+            <div id="weatherdisplay">
+                <div id="weathertitle">Weather</div>
+                <ul id="weatherlist"></ul>
+            </div>
             <span>&nbsp;</span>
         </div>
         <div id="tempbutton" class="overmap">
